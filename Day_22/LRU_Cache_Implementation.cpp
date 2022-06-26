@@ -1,60 +1,79 @@
-public class LRUCache {
+#include<unordered_map>
+
 class Node {
-	int key;
-	int value;
-	Node prev;
-	Node next;
-
-	Node(int k, int v) {
-		key = k;
-		value = v;
-	}
-}	
-	private Map<Integer, Node> map = new HashMap<>();
-	private Node head;
-	private Node last;
-	private int capacity;
-
-	public LRUCache(final int capacity) {
-		this.capacity = capacity;
-		head = new Node(0, 0);
-		last = new Node(0, 0);
-		head.next = last;
-		last.prev = head;
-	}
-
-	public int get(int key) {
-		Node node = map.get(key);
-		if (node == null) {
-			return -1;
-		}
-		remove(node);
-		insert(node);
-		return node.value;
-	}
-
-    public void put(int key, int value) {
-		if (map.containsKey(key)) {
-			remove(map.get(key));
-		}
-		if (map.size() == capacity) {
-			remove(last.prev);
-		}
-		insert(new Node(key, value));
-	}
+public:
+    int k;
+    int val;
+    Node* prev;
+    Node* next;
     
-	private void insert(Node node) {
-		map.put(node.key, node);
-		node.next = head.next;
-		head.next.prev = node;
-		node.prev = head;
-		head.next = node;
-	}	
+    Node(int key, int value) {
+        k = key;
+        val = value;
+        prev = NULL;
+        next = NULL;
+    }
+};
 
-	private void remove(Node node) {
-		map.remove(node.key);
-		node.prev.next = node.next;
-		node.next.prev = node.prev;
-	}
-
-}
+class LRUCache {
+public:
+    LRUCache(int capacity) {
+        cap = capacity;
+        
+        left = new Node(0, 0);
+        right = new Node(0, 0);
+        
+        left->next = right;
+        right->prev = left;
+    }
+    
+    int get(int key) {
+        if (cache.find(key) != cache.end()) {
+            remove(cache[key]);
+            insert(cache[key]);
+            return cache[key]->val;
+        }
+        return -1;
+    }
+    
+    void put(int key, int value) {
+        if (cache.find(key) != cache.end()) {
+            remove(cache[key]);
+        }
+        cache[key] = new Node(key, value);
+        insert(cache[key]);
+        
+        if (cache.size() > cap) {
+            // remove from list & delete LRU from map
+            Node* lru = left->next;
+            remove(lru);
+            cache.erase(lru->k);
+        }
+    }
+private:
+    int cap;
+    unordered_map<int, Node*> cache; // {key -> node}
+    Node* left;
+    Node* right;
+    
+    // remove node from list
+    void remove(Node* node) {
+        Node* prev = node->prev;
+        Node* next = node->next;
+        
+        prev->next = next;
+        next->prev = prev;
+    }
+    
+    // insert node at right
+    void insert(Node* node) {
+        Node* prev = right->prev;
+        Node* next = right;
+        
+        prev->next = node;
+        next->prev = node;
+        
+        node->prev = prev;
+        node->next = next;
+    }
+};
