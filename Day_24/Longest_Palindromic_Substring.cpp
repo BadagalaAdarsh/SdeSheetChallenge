@@ -1,21 +1,23 @@
-#include <bits/stdc++.h>
-string longestPalinSubstring(string s){
-    int n=s.size();
-    int len=-1;
-    int idx=-1;
-    vector<vector<bool>>dp(n,vector<bool>(n,0));
-    for(int g=0;g<n;g++){
-        for(int i=0,j=g;j<n;i++,j++){
-            if(g==0)dp[i][j]=1;
-            else if(g==1)dp[i][j]=(s[i]==s[j]);
-            else {
-                dp[i][j]=((s[i]==s[j]) && (dp[i+1][j-1]));
-            }
-            if(dp[i][j] && len<(g+1)){
-                len=g+1;
-                idx=i;
-            }
+void expand(string s, int l,int r, string &ans, int & ansLen) {
+    while(l>=0 && r<s.length() && s[l]==s[r]) {
+        if(r-l+1 > ansLen) {
+            ansLen = r - l + 1;
+            ans = s.substr(l, ansLen);
         }
+        l--; r++;
     }
-    return s.substr(idx,len);
+} 
+string longestPalinSubstring(string str)
+{
+    // Write your code here.
+    string ans="";
+    int ansLen=0;
+    int n=str.length();
+    for(int i=0;i<n;i++) {
+        // for odd length
+        expand(str,i,i,ans,ansLen);
+        // for even length
+        expand(str,i,i+1,ans,ansLen);
+    }
+    return ans;
 }
