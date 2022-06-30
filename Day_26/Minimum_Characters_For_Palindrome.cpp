@@ -1,3 +1,5 @@
+#include<bits/stdc++.h>
+
 int minCharsforPalindrome(string str) {
 	// Write your code here.
       string input = str + "@";
