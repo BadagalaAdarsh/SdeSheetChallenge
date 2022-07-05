@@ -1,75 +1,42 @@
 #include<bits/stdc++.h>
-
-void helper(TreeNode<int>* root,TreeNode<int>*leaf,stack<pair<TreeNode<int>*,bool>> &st,bool prev){
-
-   if(!st.empty() and st.top().first==leaf)return;
-
-   if(root==NULL)return ;
-
-   st.push({root,prev});
-
-   helper(root->left,leaf,st,true);
-
-   helper(root->right,leaf,st,false);
-
-   if(!st.empty() and st.top().first->data!=leaf->data)st.pop();
-
+bool helper(TreeNode<int> *root, TreeNode<int> *leaf,stack<TreeNode<int>*> &st){
+    st.push(root);
+//     cout<<st.size()<<" ";
+    if(!root->left && !root->right){
+        if(root->data==leaf->data)
+            return true;
+        else{
+            st.pop();return false;
+        }
+    }
+    if(root->left){
+    if(helper(root->left,leaf,st)) return true;}
+    if(root->right){
+    if(helper(root->right,leaf,st)) return true;}
+    st.pop(); return false;
 }
-
 TreeNode<int> * invertBinaryTree(TreeNode<int> *root, TreeNode<int> *leaf)
-
 {
-
-   // Write your code here.
-
-   //L=1,R=0
-
-   stack<pair<TreeNode<int>*,bool>>st;
-
-   helper(root,leaf,st,false);
-
-   bool prevDir =st.top().second;
-
- st.pop();
-
-   TreeNode<int>* t=leaf;
-
-   while(!st.empty()){
-
-       if(prevDir==true){
-
-           st.top().first->left=NULL;
-
-           t->left=st.top().first;
-
-       }
-
-       else{
-
-           st.top().first->right=st.top().first->left;
-
-           st.top().first->left=NULL;
-
-           t->left=st.top().first;
-
-       }
-
-       t=st.top().first;
-
-       prevDir=st.top().second;
-
-       st.pop();
-
-   }
-
-   if(leaf->right){
-
-       leaf->left=leaf->right;
-
-       leaf->right=NULL;
-
-   }
-
-   return leaf;
-
-   }
+	if(!root)
+        return NULL;
+    stack<TreeNode<int> *> st;
+    bool f=helper(root,leaf,st);
+    TreeNode<int> *new_root=st.top();
+    st.pop();
+    TreeNode<int> *par=new_root;
+    while(!st.empty()){
+        auto cur=st.top();
+        st.pop();
+        if(cur->left==par){
+            cur->left=NULL;
+            par->left=cur;
+        }
+        else{
+            cur->right=cur->left;
+            cur->left=NULL;
+            par->left=cur;
+        }
+        par=cur;
+    }
+    return new_root;
+}
